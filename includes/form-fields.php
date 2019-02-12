@@ -24,14 +24,12 @@ return array(
         'type'          => 'text',
         'desc_tip'      => true,
         'description'   => __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-        'default'       => __( "todo_description", 'woocommerce' ),
+        'default'       => __( "Pay via Straal Checkout with card or pay-by-link.", 'woocommerce' ),
     ),
-	'sandbox'                   => array(
-		'title'         => __( 'Sandbox mode', 'woocommerce' ),
-		'type'          => 'checkbox',
-		'label'         => __( 'Enable Straal sandbox (separate API key required)', 'woocommerce' ),
-		'default'       => 'no',
-		'description'   => __( 'Straal sandbox is used to test making transactions.', 'woocommerce' ),
+	'api_key_title'             => array(
+		'title'         => __( 'Basic configuration', 'woocommerce' ),
+		'type'          => 'title',
+		'description'   => __( 'Required in order to start using Straal payments.', 'woocommerce' ),
 	),
     'api_key'                   => array(
         'title'         => __( 'API key', 'woocommerce' ),
@@ -40,6 +38,18 @@ return array(
         'description'   => __( 'API key used to authenticate transaction.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),
     ),
+	'sandbox_title'             => array(
+		'title'         => __( 'Sandbox mode', 'woocommerce' ),
+		'type'          => 'title',
+		'description'   => __( 'Sandbox mode lets you create transactions in a test environment.', 'woocommerce' ),
+	),
+	'sandbox'                   => array(
+        'title'         => __( 'Enable/Disable', 'woocommerce' ),
+		'type'          => 'checkbox',
+		'label'         => __( 'Enable Straal sandbox mode', 'woocommerce' ),
+        'description'   => __( 'Separate API key is required for sandbox mode to work.', 'woocommerce' ),
+		'default'       => 'no'
+	),
     'sandbox_api_key'           => array(
         'title'         => __( 'Sandbox API key', 'woocommerce' ),
         'type'          => 'text',
@@ -47,12 +57,27 @@ return array(
         'description'   => __( 'API key used to authenticate sandbox transaction.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),
     ),
+	'notifications_title'       => array(
+		'title'         => __( 'Notifications configuration', 'woocommerce' ),
+		'type'          => 'title',
+        'description'   => __( 'Notifications from Straal allow for automatic payment status updates for your orders. To make notifications work you need to provide Straal staff with WooCommerce Callback URL and authorization credentials (should be also defined in user/password fields below).', 'woocommerce' ),
+	),
+    'notifications_callback'        => array(
+        'title'         => __( 'Callback URL', 'woocommerce' ),
+        'type'          => 'text',
+        'desc_tip'      => true,
+        'description'   => __( 'WooCommerce callback URL which is used to receive notifications from Straal. You need to provide it to Straal staff in order to have orders payment statuses automatically updated.', 'woocommerce' ),
+        'default'       => site_url() . '/wc-api/wc_gateway_straal',
+        'custom_attributes' => array(
+            'readonly' => 'readonly'
+        ),
+    ),
     'notifications_user'        => array(
         'title'         => __( 'Notifications username', 'woocommerce' ),
         'type'          => 'text',
         'desc_tip'      => true,
         'description'   => __( 'Username to authenticate order status updates.', 'woocommerce' ),
-        'default'       => __( "", 'woocommerce' ),
+        'default'       => __( "", 'woocommerce' )
     ),
     'notifications_password'    => array(
         'title'         => __( 'Notifications password', 'woocommerce' ),

@@ -41,7 +41,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 				$this->has_fields 			= false;
 				$this->order_button_text 	= __( 'Proceed to Straal', 'woocommerce' );
 				$this->method_title      	= __( 'Straal Checkout', 'woocommerce' );
-				$this->method_description 	= __( 'todo_method_description', 'woocommerce' );
+				$this->method_description 	= __( 'Straal Checkout redirects customers to Straal in order to enter their payment information.', 'woocommerce' );
 				$this->icon 				= apply_filters( 'woocommerce_gateway_icon', $plugin_dir.'assets/icon.png' );
 				$this->supports				= array(
 					'refunds'
