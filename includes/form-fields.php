@@ -15,46 +15,46 @@ return array(
     'title'                     => array(
         'title'         => __( 'Title', 'woocommerce' ),
         'type'          => 'text',
-        'description'   => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-        'default'       => __( 'Straal Checkout', 'woocommerce' ),
+        'description'   => __( 'Title of payment method that user sees when placing the order. By default "Straal".', 'woocommerce' ),
+        'default'       => __( 'Straal', 'woocommerce' ),
         'desc_tip'      => true,
     ),
     'description'               => array(
         'title'         => __( 'Description', 'woocommerce' ),
         'type'          => 'text',
         'desc_tip'      => true,
-        'description'   => __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-        'default'       => __( "Pay via Straal Checkout with card or pay-by-link.", 'woocommerce' ),
+        'description'   => __( 'Description of the payment method that user sees when placing the order.', 'woocommerce' ),
+        'default'       => __( "", 'woocommerce' ),
     ),
 	'api_key_title'             => array(
 		'title'         => __( 'Basic configuration', 'woocommerce' ),
 		'type'          => 'title',
-		'description'   => __( 'Required in order to start using Straal payments.', 'woocommerce' ),
+		'description'   => __( 'This will allow you to accept your payments.', 'woocommerce' ),
 	),
     'api_key'                   => array(
         'title'         => __( 'API key', 'woocommerce' ),
         'type'          => 'password',
         'desc_tip'      => true,
-        'description'   => __( 'API key used to authenticate transaction.', 'woocommerce' ),
+        'description'   => __( 'API Key for authorizing a transaction. Contact your account manager to receive it or configure it in Straal Kompas.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),
     ),
 	'sandbox_title'             => array(
 		'title'         => __( 'Sandbox mode', 'woocommerce' ),
 		'type'          => 'title',
-		'description'   => __( 'Sandbox mode lets you create transactions in a test environment.', 'woocommerce' ),
+		'description'   => __( 'Use Sandbox mode to create test transactions and see if everything works as intended.', 'woocommerce' ),
 	),
 	'sandbox'                   => array(
         'title'         => __( 'Enable/Disable', 'woocommerce' ),
 		'type'          => 'checkbox',
 		'label'         => __( 'Enable Straal sandbox mode', 'woocommerce' ),
-        'description'   => __( 'Separate API key is required for sandbox mode to work.', 'woocommerce' ),
+        'description'   => __( 'You need a separate API key and test service to use the sandbox mode.', 'woocommerce' ),
 		'default'       => 'no'
 	),
     'sandbox_api_key'           => array(
         'title'         => __( 'Sandbox API key', 'woocommerce' ),
         'type'          => 'text',
         'desc_tip'      => true,
-        'description'   => __( 'API key used to authenticate sandbox transaction.', 'woocommerce' ),
+        'description'   => __( 'Sandbox mode API Key used to authenticate transaction.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),
     ),
 	'notifications_title'       => array(
@@ -66,7 +66,7 @@ return array(
         'title'         => __( 'Callback URL', 'woocommerce' ),
         'type'          => 'text',
         'desc_tip'      => true,
-        'description'   => __( 'WooCommerce callback URL which is used to receive notifications from Straal. You need to provide it to Straal staff in order to have orders payment statuses automatically updated.', 'woocommerce' ),
+        'description'   => __( 'We will POST the notifications about the payment status at this URL. To configure the notifications provide callback URL to your Straal Account Manager.', 'woocommerce' ),
         'default'       => site_url() . '/wc-api/wc_gateway_straal',
         'custom_attributes' => array(
             'readonly' => 'readonly'

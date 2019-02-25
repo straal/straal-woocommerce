@@ -52,6 +52,9 @@ class WC_Gateway_Straal_Request {
      * @return string
      */
     public function create_customer( $order ) {
+        $customer_id = $order->get_customer_id();
+        $customer_email = $order->get_billing_email();
+        $customer_reference = $customer_id == 0 ? NULL : $customer_id . '#' . $customer_email;
         $response = wp_remote_post( $this->endpoint . 'v1/customers', $args = array(
             'headers' 	=> array(
                 'Content-Type'	=> 'application/json',
@@ -60,8 +63,8 @@ class WC_Gateway_Straal_Request {
             'body' 		=> 
                 json_encode( 
                     array(
-                        'email' 	=> $order->get_billing_email(),
-                        'reference' => $order->get_customer_id(),
+                        'email' 	=> $customer_email,
+                        'reference' => $customer_reference,
                     ) 
                 ),
         ) );
@@ -184,7 +187,7 @@ class WC_Gateway_Straal_Request {
                 }
             }
         } else {
-            return $response_body['id'];
+            return $response_body->id;
         }
     }
 }
