@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Straal Checkout
  * Plugin URI: http://woocommerce.com/products/straal-checkout/
- * Description: Todo.
+ * Description: Redirect your customers to Straal Checkout page for quick, easy and secure payments.
  * Version: 1.0.0
  * Author: WooCommerce
  * Author URI: http://woocommerce.com/
