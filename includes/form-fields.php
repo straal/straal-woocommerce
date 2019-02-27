@@ -52,7 +52,7 @@ return array(
 	),
     'sandbox_api_key'           => array(
         'title'         => __( 'Sandbox API key', 'woocommerce' ),
-        'type'          => 'text',
+        'type'          => 'password',
         'desc_tip'      => true,
         'description'   => __( 'Sandbox mode API Key used to authenticate transaction.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),

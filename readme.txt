@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Straal Checkout ===
 Contributors: Straal
 Tags: payment, gateway
 Requires at least: 4.0.1
