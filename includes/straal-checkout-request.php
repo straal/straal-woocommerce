@@ -87,7 +87,7 @@ class WC_Gateway_Straal_Request {
                 'ttl'               => 600,
                 'return_url'        => $this->gateway->get_return_url( $order ),
                 'failure_url'       => $this->gateway->get_return_url( $order ), // To update
-                'order_description' => 'Star Wars mug XXL', //TODO: Generate order description
+                'order_description' => get_bloginfo( 'name' ),
                 'order_reference'   => $order->get_order_number(),
             );
     
