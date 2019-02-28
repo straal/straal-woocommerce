@@ -33,15 +33,21 @@ class WC_Gateway_Straal_Request {
 	protected $api_key;
 
 	/**
+	 * WC_Logger instance.
+	 **/
+    protected $logger;
+
+	/**
 	 * Constructor.
      * 
 	 * @param WC_Gateway_Straal $gateway Paypal gateway object.
      * @param string $api_key Merchant's Straal API key.
 	 **/
 	public function __construct( $gateway, $api_key ) {
-		$this->endpoint = 'https://api.straal.com/';
-		$this->gateway  = $gateway;
-		$this->api_key  = $api_key;
+        $this->endpoint = 'https://api.straal.com/';
+        $this->gateway  = $gateway;
+        $this->api_key  = $api_key;
+        $this->logger   = wc_get_logger();        
 	}
 
     /**
@@ -55,18 +61,28 @@ class WC_Gateway_Straal_Request {
         $customer_id = $order->get_customer_id();
         $customer_email = $order->get_billing_email();
         $customer_reference = $customer_id == 0 ? NULL : $customer_id . '#' . $customer_email;
+
+        $customer_params = array(
+            'email' 	=> $customer_email,
+            'reference' => $customer_reference,
+        );
+
+        $this->logger->info( 'create_customer: Requesting customer creation.', array(
+            'source' => 'straal-checkout',
+            'data' => $customer_params
+        ) );
+
         $response = wp_remote_post( $this->endpoint . 'v1/customers', $args = array(
+            'body' 		=> json_encode( $customer_params ),
             'headers' 	=> array(
                 'Content-Type'	=> 'application/json',
                 'Authorization' => $this->get_authorization_string(),
             ),
-            'body' 		=> 
-                json_encode( 
-                    array(
-                        'email' 	=> $customer_email,
-                        'reference' => $customer_reference,
-                    ) 
-                ),
+        ) );
+    
+        $this->logger->info( 'create_customer: Customer creation response.', array(
+            'source' => 'straal-checkout',
+            'data' => $response
         ) );
 
         return $this->extract_customer_id_from_response( $order, $response );
@@ -90,6 +106,11 @@ class WC_Gateway_Straal_Request {
                 'order_description' => get_bloginfo( 'name' ),
                 'order_reference'   => $order->get_order_number(),
             );
+
+            $this->logger->info( 'initialize_checkout: Requesting checkout initialization.', array(
+                'source' => 'straal-checkout',
+                'data' => $transaction_params
+            ) );
     
             $response = wp_remote_post( $this->endpoint . 'v1/customers/' . $customer_id . '/checkouts', $args = array(
                 'body'      => json_encode( $transaction_params ),
@@ -99,9 +120,22 @@ class WC_Gateway_Straal_Request {
                 ),
             ) );
     
+            $this->logger->info( 'initialize_checkout: Checkout initialization response.', array(
+                'source' => 'straal-checkout',
+                'data' => $response
+            ) );
+
             $response_body = json_decode( wp_remote_retrieve_body( $response ) );
     
             return $response_body;
+        } else {
+            $this->logger->error( 'initialize_checkout: Customer id not provided!', array( 
+                'source' => 'straal-checkout',
+                'data' => array(
+                    'order' => $order,
+                    'customer_id' => $customer_id
+                )
+            ));
         }
     }
 
@@ -115,17 +149,19 @@ class WC_Gateway_Straal_Request {
      */
     public function refund_transaction( $order, $amount, $reason ) {
         $transaction_id = $order->get_transaction_id();
-        error_log('refund_transaction');
 
         if ( $transaction_id ) {
-            error_log('transaction_id');
-            error_log($transaction_id);
             $refund_params = array(
                 'amount'     => $amount,
                 'extra_data' => array(
                     'reason' => $reason
                 )
             );
+
+            $this->logger->info( 'refund_transaction: Requesting refund.', array(
+                'source' => 'straal-checkout',
+                'data' => $refund_params
+            ) );
 
             $response = wp_remote_post( $this->endpoint . 'v1/transactions/' . $transaction_id . '/refund', $args = array(
                 'body'      => json_encode( $refund_params ),
@@ -134,8 +170,22 @@ class WC_Gateway_Straal_Request {
                     'Authorization' => $this->get_authorization_string(),
                 )
             ) );
+
+            $this->logger->info( 'refund_transaction: Refund request response.', array(
+                'source' => 'straal-checkout',
+                'data' => $response
+            ) );
     
             return $response;
+        } else {
+            $this->logger->error( 'refund_transaction: Transaction id not found!', array( 
+                'source' => 'straal-checkout',
+                'data' => array(
+                    'order' => $order,
+                    'amount' => $amount,
+                    'reason' => $reason
+                )
+            ));
         }
     }
 
