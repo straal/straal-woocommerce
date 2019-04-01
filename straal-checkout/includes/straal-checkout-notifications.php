@@ -19,12 +19,19 @@ class WC_Gateway_Straal_Notifications {
 	protected $gateway;
 
 	/**
+	 * Straal logger instance.
+	 **/
+    protected $logger;
+
+	/**
 	 * Constructor.
 	 * 
 	 */
 	public function __construct( $gateway ) {
 		$this->gateway  = $gateway;
 		add_action( 'woocommerce_api_wc_gateway_straal', array( $this, 'process_notification' ) );
+        include_once dirname( __FILE__ ) . '/straal-checkout-logger.php';
+        $this->logger       = new WC_Gateway_Straal_Logger( $gateway );
 	}
 
 	/**
@@ -36,6 +43,7 @@ class WC_Gateway_Straal_Notifications {
 		
 		if (!empty($request_body)) {
 			$notification_type = $request_body->event;
+			$this->logger->info( 'process_notification', $request_body );
 			switch ($notification_type) {
 				case 'request_finished':
 					if ($this->process_request_finished( $request_body )) {
@@ -65,14 +73,30 @@ class WC_Gateway_Straal_Notifications {
 		$should_handle_notification = $request_body->data->permission == 'v1.transactions.checkout_attempt_create';
 		$notification_data = $request_body->data->response;
 		
-		$is_valid = $should_handle_notification && $this->verify_currency_and_amount( $notification_data );
+		$is_valid = $should_handle_notification && !$this->does_card_payment_have_errors( $notification_data ) && $this->verify_currency_and_amount( $notification_data );
+
+		$this->logger->info( 'process_request_finished', $request_body );
+		$this->logger->info( 'process_request_finished: $is_valid', $is_valid );
 
 		if ($is_valid) {
+			$this->logger->info( 'process_request_finished: valid' );
 			$is_transaction_authorized = $notification_data->authorized;
 			$this->finalize_payment( $notification_data, $is_transaction_authorized );
+		} else {
+			$this->logger->info( 'process_request_finished: invalid' );
+			$this->finalize_payment( $notification_data, false );
 		}
 
 		return $is_valid;
+	}
+
+	/**
+	 * Check if card payment notification has errors.
+	 * 
+	 * @param object $request_body  Body of a POST request.
+	 */
+	protected function does_card_payment_have_errors( $request_body ) {
+		return property_exists($request_body, 'errors') && count($request_body->errors) > 0;
 	}
 
 	/**
@@ -116,9 +140,13 @@ class WC_Gateway_Straal_Notifications {
 	 */
 	protected function verify_currency_and_amount( $notification_data ) {
 		$order = $this->get_order_from_notification( $notification_data );
-		$currency_is_valid = $this->validate_currency( $order, $notification_data->checkout->currency );
-		$amount_is_valid = $this->validate_amount( $order, $notification_data->checkout->amount );
-		return $currency_is_valid && $amount_is_valid;
+		if ($order) {
+			$currency_is_valid = $this->validate_currency( $order, $notification_data->checkout->currency );
+			$amount_is_valid = $this->validate_amount( $order, $notification_data->checkout->amount );
+			return $currency_is_valid && $amount_is_valid;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -132,7 +160,7 @@ class WC_Gateway_Straal_Notifications {
 		$notification_currency = strtolower( $currency );
 		$is_valid = $order_currency == $notification_currency;
 		if ( !$is_valid ) {
-			error_log('currency mismatch');
+			$this->logger->info( 'validate_currency: Validation error: Straal and WooCommerce currencies do not match.' );
 			$order->update_status( 'on-hold', __( 'Validation error: Straal and WooCommerce currencies do not match.', 'woocommerce' ) );
 		}
 		return $is_valid;
@@ -149,7 +177,7 @@ class WC_Gateway_Straal_Notifications {
 		$notification_amount = $this->gateway->format_transaction_total( $amount );
 		$is_valid = number_format( $order_amount, 2, '.', '' ) == number_format( $notification_amount, 2, '.', '' );
 		if ( !$is_valid ) {
-			error_log('amount mismatch');
+			$this->logger->info( 'validate_amount: Validation error: Straal and WooCommerce amounts do not match.' );
 			$order->update_status( 'on-hold', __( 'Validation error: Straal and WooCommerce amounts do not match.', 'woocommerce' ) );
 		}
 		return $is_valid;
@@ -165,7 +193,7 @@ class WC_Gateway_Straal_Notifications {
 		$order = $this->get_order_from_notification( $notification_data );
 		
 		if ( $order ) {
-			error_log('Order ' . $order->get_id() . ' is ' . ($is_transaction_authorized ? 'authorized.' : 'not authorized.'));
+			$this->logger->info( 'Order ' . $order->get_id() . ' is ' . ($is_transaction_authorized ? 'authorized.' : 'not authorized.') );
 			
 			if ( !$order->has_status( wc_get_is_paid_statuses() ) ) {
 				if ( $is_transaction_authorized ) {
@@ -194,10 +222,15 @@ class WC_Gateway_Straal_Notifications {
 	 *
 	 * @param object $notification_data JSON with notification details.
 	 * 
-     * @return WC_Order
+     * @return boolean|WC_Order
 	 */
 	protected function get_order_from_notification( $notification_data ) {
-		$order_id = $notification_data->checkout->order_reference;
-		return wc_get_order( $order_id );
+		if (property_exists($notification_data, 'checkout')) {
+			$order_id = $notification_data->checkout->order_reference;
+			return wc_get_order( $order_id );
+		} else {
+			$this->logger->error( 'finalize_payment: Cannot extract order id from.' );
+			return false;
+		}
 	}
 }

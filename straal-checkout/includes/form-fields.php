@@ -5,6 +5,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
+
+$logging_label = __( 'Enable Logging', 'woocommerce' );
+
+if ( defined( 'WC_LOG_DIR' ) ) {
+	$log_url = add_query_arg( 'tab', 'logs', add_query_arg( 'page', 'wc-status', admin_url( 'admin.php' ) ) );
+	$log_key = 'straal-checkout-' . sanitize_file_name( wp_hash( 'straal-checkout' ) ) . '-log';
+	$log_url = add_query_arg( 'log_file', $log_key, $log_url );
+
+	$logging_label .= ' | ' . sprintf( __( '%1$sView Log%2$s', 'woocommerce' ), '<a href="' . esc_url( $log_url ) . '">', '</a>' );
+}
+
 return array(
     'enabled' 			        => array(
         'title' 	    => __( 'Enable/Disable', 'woocommerce' ),
@@ -86,4 +97,11 @@ return array(
         'description'   => __( 'Password to authenticate order status updates.', 'woocommerce' ),
         'default'       => __( "", 'woocommerce' ),
     ),
+    'wc_straal_checkout_debug'  => array(
+        'title'         => __( 'Debug Log', 'woocommerce' ),
+        'label'         => $logging_label,
+        'description'         => __( 'Enable the logging of info messages.', 'woocommerce' ),
+        'type'        => 'checkbox',
+        'default'     => 'no',
+    )
 );
