@@ -59,9 +59,8 @@ class WC_Gateway_Straal_Request {
      * @return string
      */
     public function create_customer( $order ) {
-        $customer_id = $order->get_customer_id();
         $customer_email = $order->get_billing_email();
-        $customer_reference = $customer_id == 0 ? NULL : $customer_id . '#' . $customer_email;
+        $customer_reference = $this->generate_customer_reference_order( $order );
 
         $customer_params = array(
             'email' 	=> $customer_email,
@@ -182,17 +181,31 @@ class WC_Gateway_Straal_Request {
     }
 
     /**
+     * Generate customer reference from order.
+     *
+     * @param WC_Order $order Order object.
+     * @return string
+     */
+    public function generate_customer_reference_order( $order ) {
+        $customer_id = $order->get_customer_id();
+        $customer_email = $order->get_billing_email();
+        return $customer_id == 0 ? NULL : $customer_id . '#' . $customer_email;
+    }
+
+    /**
      * Get Straal customer id from customers list by WooCommerce customer id.
      *
      * @param WC_Order $order Order object.
      * @return string
      */
     public function get_customer_id_by_reference( $order ) {
-        $response = wp_remote_get( $this->endpoint . 'v1/customers?reference__eq=' . $order->get_customer_id(), $args = array(
+        $response = wp_remote_get( $this->endpoint . 'v1/customers?reference__eq=' . urlencode( $this->generate_customer_reference_order( $order ) ), $args = array(
             'headers' => array(
                 'Authorization' => $this->get_authorization_string(),
             ),
         ) );
+
+        $this->logger->info( 'get_customer_id_by_reference: Customer data from WooCommerce reference.', $response );
 
         $response_body = json_decode( wp_remote_retrieve_body( $response ) );
         $customer = array_values( $response_body->data )[0];
