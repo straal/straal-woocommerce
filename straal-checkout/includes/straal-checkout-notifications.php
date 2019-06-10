@@ -51,6 +51,8 @@ class WC_Gateway_Straal_Notifications {
 				) {
 					exit;
 				}
+			} else {
+				wp_die( 'Non-handled Straal Notification', 'Straal Notifications', array( 'response' => 200 ) );
 			}
 		}
 		wp_die( 'Invalid Straal Notification', 'Straal Notifications', array( 'response' => 500 ) );
@@ -195,7 +197,7 @@ class WC_Gateway_Straal_Notifications {
 	
 			$success_statuses = array( 'succeeded' );
 			$failed_statuses = array( 'failed', 'expired' );
-	
+
 			if ( in_array($attempt_status, $success_statuses) ) {
 				return true;
 			} elseif ( in_array($attempt_status, $failed_statuses) ) {
