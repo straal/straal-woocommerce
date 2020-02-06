@@ -87,7 +87,8 @@ class WC_Gateway_Straal_Notifications {
 		$order = $this->get_order_from_notification( $notification_data );
 		
 		if ( $order ) {
-			$this->logger->info( 'Order ' . $order->get_id() . ' is ' . ($is_transaction_authorized ? 'authorized.' : 'not authorized.') );
+		    $log_msg = 'Order ' . $order->get_id() . ' is ' . ($is_transaction_authorized ? 'authorized.' : 'not authorized.');
+			$this->logger->info( $log_msg , NULL );
 			
 			if ( !$order->has_status( wc_get_is_paid_statuses() ) ) {
 				if ( $is_transaction_authorized ) {
@@ -142,7 +143,7 @@ class WC_Gateway_Straal_Notifications {
 		$notification_currency = strtolower( $currency );
 		$is_valid = $order_currency == $notification_currency;
 		if ( !$is_valid ) {
-			$this->logger->info( 'validate_currency: Validation error: Straal and WooCommerce currencies do not match.' );
+			$this->logger->info( 'validate_currency: Validation error: Straal and WooCommerce currencies do not match.' , NULL);
 			$order->update_status( 'on-hold', __( 'Validation error: Straal and WooCommerce currencies do not match.', 'woocommerce' ) );
 		}
 		return $is_valid;
@@ -161,7 +162,7 @@ class WC_Gateway_Straal_Notifications {
 		$notification_amount = $this->gateway->format_transaction_total( $amount );
 		$is_valid = number_format( $order_amount, 2, '.', '' ) == number_format( $notification_amount, 2, '.', '' );
 		if ( !$is_valid ) {
-			$this->logger->info( 'validate_amount: Validation error: Straal and WooCommerce amounts do not match.' );
+			$this->logger->info( 'validate_amount: Validation error: Straal and WooCommerce amounts do not match.' , NULL );
 			$order->update_status( 'on-hold', __( 'Validation error: Straal and WooCommerce amounts do not match.', 'woocommerce' ) );
 		}
 		return $is_valid;
@@ -179,7 +180,7 @@ class WC_Gateway_Straal_Notifications {
 			$order_id = $notification_data->checkout->order_reference;
 			return wc_get_order( $order_id );
 		} else {
-			$this->logger->error( 'finalize_payment: Cannot extract order id from notification data.' );
+			$this->logger->error( 'finalize_payment: Cannot extract order id from notification data.' , NULL );
 			return false;
 		}
 	}
@@ -204,7 +205,7 @@ class WC_Gateway_Straal_Notifications {
 				return false;
 			}
 		} else {			
-			$this->logger->error( 'get_transaction_authorization_status: No notification data provided!.' );
+			$this->logger->error( 'get_transaction_authorization_status: No notification data provided!.' , NULL );
 		}
 	}
 }
