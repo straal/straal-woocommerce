@@ -65,7 +65,7 @@ class WC_Gateway_Straal_Logger {
     public function log( string $level, string $message, $data ) {
         if ( $this->is_logging_enabled() ) {
             $this->logger->log( $level, $message, $this->log_context );
-            if ( $data != NULL ) {
+            if ( !is_null($data) ) {
                 $this->logger->log( $level, json_encode($data, true), $this->log_context );
             }
         }
