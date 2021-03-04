@@ -189,7 +189,7 @@ class WC_Gateway_Straal_Request {
     public function generate_customer_reference_order( $order ) {
         $customer_id = $order->get_customer_id();
         $customer_email = $order->get_billing_email();
-        return $customer_id == 0 ? NULL : $customer_id . '#' . $customer_email;
+        return $customer_id == 0 ? NULL : substr($customer_id . '#' . md5($customer_email), 0, 30);
     }
 
     /**
