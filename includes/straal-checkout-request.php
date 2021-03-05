@@ -44,7 +44,7 @@ class WC_Gateway_Straal_Request {
      * @param string $api_key Merchant's Straal API key.
 	 **/
 	public function __construct( $gateway, $api_key ) {
-        $this->endpoint     = 'https://api.straal.com/';
+        $this->endpoint     = getenv('STRAAL_WOOCOMMERCE_API_SERVER_OVERRIDE') ?: 'https://api.straal.com/';
         $this->gateway      = $gateway;
         $this->api_key      = $api_key;
         include_once dirname( __FILE__ ) . '/straal-checkout-logger.php';
