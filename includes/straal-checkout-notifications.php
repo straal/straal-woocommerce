@@ -108,7 +108,7 @@ class WC_Gateway_Straal_Notifications {
 	 * @param object $notification_data JSON with notification details.
 	 */
 	protected function complete_order( $order, $notification_data ) {
-		$order->payment_complete( $notification_data->id );
+		$order->payment_complete( $notification_data->transaction->id );
 		WC()->cart->empty_cart();
 	}
 
