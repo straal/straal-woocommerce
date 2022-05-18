@@ -99,6 +99,9 @@ class WC_Gateway_Straal_Request {
                 'failure_url'       => $this->gateway->get_return_url( $order ), // To update
                 'order_description' => get_bloginfo( 'name' ),
                 'order_reference'   => $order->get_order_number(),
+                'card_transaction'  => array(
+                    'type' => 'oneshot'
+                ),
             );
 
             $this->logger->info( 'initialize_checkout: Requesting checkout initialization.', $transaction_params);
