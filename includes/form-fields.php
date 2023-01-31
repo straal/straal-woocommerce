@@ -78,7 +78,7 @@ return array(
         'type'          => 'text',
         'desc_tip'      => true,
         'description'   => __( 'We will POST the notifications about the payment status at this URL. To configure the notifications provide callback URL to your Straal Account Manager.', 'woocommerce' ),
-        'default'       => site_url() . '/wc-api/wc_gateway_straal',
+        'default'       => site_url().'/?wc-api=wc_gateway_straal',
         'custom_attributes' => array(
             'readonly' => 'readonly'
         ),
